@@ -176,23 +176,49 @@
                 }
             });
 
+            function generatePermalink(baseUrl, code, inputs) {
+                // Serialize the code and inputs to a JSON string
+                const data = JSON.stringify({ code, inputs });
+            
+                // Encode the JSON string to base64
+                const encodedData = btoa(data);
+            
+                // Return the complete permalink
+                return `${baseUrl}?data=${encodeURIComponent(encodedData)}`;
+            }
+
+            function decodePermalink(url) {
+                // Extract the `data` parameter from the URL
+                const params = new URL(url).searchParams;
+                const encodedData = params.get('data');
+            
+                if (!encodedData) {
+                    throw new Error('No data parameter found in the URL');
+                }
+            
+                // Decode the base64 string and parse the JSON
+                const decodedData = JSON.parse(atob(encodedData));
+            
+                return {
+                    code: decodedData.code,
+                    inputs: decodedData.inputs
+                };
+            }
+
             permalinkBtn.addEventListener('click', () => {
-                const code = encodeURIComponent(codeEditor.value);
-                const inputs = encodeURIComponent(inputBox.value);
-                const permalink = `https://lyxal.github.io/Joeasus/?code=${code}&inputs=${inputs}`;
+                permalink = generatePermalink("https://lyxal.github.io/Joeasus/", codeEditor.value, inputBox.value)
                 permalinkInput.value = permalink;
             });
 
             // Read permalink on page load
             const urlParams = new URLSearchParams(window.location.search);
-            const codeParam = urlParams.get('code');
-            const inputsParam = urlParams.get('inputs');
+            const info = decodePermalink(urlParams)
 
-            if (codeParam) {
-                codeEditor.value = decodeURIComponent(codeParam);
+            if (info.code) {
+                codeEditor.value = info.code;
             }
-            if (inputsParam) {
-                inputBox.value = decodeURIComponent(inputsParam);
+            if (info.inputs) {
+                inputBox.value = info.inputs;
             }
 
             // Add some visual effects
