@@ -211,8 +211,7 @@
             });
 
             // Read permalink on page load
-            const urlParams = new URLSearchParams(window.location.search);
-            const info = decodePermalink(urlParams)
+            const info = decodePermalink(window.location.href)
 
             if (info.code) {
                 codeEditor.value = info.code;
